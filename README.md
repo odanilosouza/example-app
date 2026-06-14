@@ -1,58 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Portal Cliente
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Portal Cliente é um sistema web composto por um backend em Laravel 13 e um frontend em Next.js 14.
 
-## About Laravel
+O objetivo do projeto é oferecer um portal de cliente com autenticação por CNPJ, cadastro de clientes, painel de métricas, documentos, relatórios, imagens e notificações.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Arquitetura
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Backend**: Laravel 13 com Sanctum, API RESTful e controle de acesso.
+- **Frontend**: Next.js 14 com React, Tailwind e Axios para consumir a API.
+- **Banco de dados**: SQLite por padrão no ambiente local.
+- **Autenticação**: login por CNPJ + senha. O frontend usa token Bearer gerado pelo Sanctum.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Funcionalidades
 
-## Learning Laravel
+- Registro de clientes com criação de `Client` e `User` associados.
+- Login utilizando os 4 primeiros dígitos do CNPJ do cliente.
+- Pagina de portal com painel de métricas de documentos, relatórios, imagens e visitas.
+- API protegida com `auth:sanctum`.
+- Endpoints para clientes, documentos, relatórios, imagens, notificações e histórico.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Instalação
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Backend
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+cd /home/danilo/laravel/example-app
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --force
+php artisan db:seed --class=DatabaseSeeder
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Frontend
 
-## Contributing
+```bash
+cd /home/danilo/laravel/example-app/frontend
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Variáveis de ambiente
 
-## Code of Conduct
+- `APP_URL` deve apontar para o servidor Laravel local, por exemplo `http://127.0.0.1:8002`.
+- `NEXT_PUBLIC_API_URL` pode ser configurado para `http://127.0.0.1:8002` para garantir que o frontend consuma o backend correto.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Se não estiver definido, o frontend usa `http://127.0.0.1:8002` como padrão.
 
-## Security Vulnerabilities
+## Como executar
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Opcional: rodar backend e frontend separados
 
-## License
+```bash
+cd /home/danilo/laravel/example-app
+php artisan serve --host=127.0.0.1 --port=8002
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+cd /home/danilo/laravel/example-app/frontend
+npm run dev
+```
+
+### Rodar ambiente completo
+
+```bash
+cd /home/danilo/laravel/example-app
+composer run dev
+```
+
+> O frontend deve iniciar em `http://localhost:3000` ou em outra porta disponível, como `3001`.
+
+## Endpoints principais
+
+### Autenticação
+
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `GET /api/auth/me`
+- `POST /api/auth/logout`
+- `POST /api/auth/change-password`
+
+### Dashboard
+
+- `GET /api/dashboard/client`
+- `GET /api/dashboard/admin`
+
+### Clientes e recursos
+
+- `GET /api/clients`
+- `GET /api/clients/{client}`
+- `GET /api/documents`
+- `POST /api/documents`
+- `GET /api/reports`
+- `GET /api/images`
+- `GET /api/notifications`
+
+## Credenciais de teste
+
+O seeder já cria clientes e usuários de teste. Use um desses pares para login:
+
+- `1234` / `password` (CNPJ: `12.345.678/0001-99`)
+- `1111` / `password` (CNPJ: `11.111.111/0001-11`)
+- `2222` / `password` (CNPJ: `22.222.222/0001-22`)
+
+No frontend, informe apenas os 4 primeiros dígitos do CNPJ no campo de login.
+
+## Observações
+
+- O Laravel foi configurado para redirecionar a raiz `/` para o frontend.
+- A aplicação usa migrations para criar as tabelas de `personal_access_tokens` e `notifications` necessárias para autenticação e dashboard.
+- Arquivos de build e dependências do frontend não devem ser versionados. Use `npm install` localmente para gerar `node_modules`.
+
+## Deploy
+
+Para deploy, mantenha o backend e o frontend separados. O backend expõe a API e o frontend consome os endpoints via `NEXT_PUBLIC_API_URL`.
+
+## Licença
+
+Projeto sob licença MIT.
